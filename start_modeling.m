@@ -1,5 +1,4 @@
-function opt_pars = start_modeling(show_fig, problem, trial_number, step_number, trial_optpars, step_optpars, method_names, noise_model)
-    disp(method_names)
+function opt_pars = start_modeling(problem, trial_number, step_number, trial_optpars, step_optpars, method_names, noise_model)
     method_funs = {};
     method_calc_opt_pars = {};
     method_init_funs = {};
@@ -35,14 +34,11 @@ function opt_pars = start_modeling(show_fig, problem, trial_number, step_number,
     for mind = 1:length(methods)
         opt_pars = [opt_pars methods(mind).calc_opt_pars(problem, step_optpars, trial_optpars)];
     end
-    
-    disp(opt_pars)
 
     for ti = 1:trial_number
         
         problem = problem.gen_new_model(noise_model, problem);
         minpt_hist = problem.minpt_hist(step_number, problem);
-%         disp(minpt_hist)
         
         for mind = 1:length(methods)             
             
@@ -78,46 +74,43 @@ function opt_pars = start_modeling(show_fig, problem, trial_number, step_number,
             methods(mind).mean_err(i) = mean(methods(mind).allerrs(i, :));
         end
     end    
-    
-    if (show_fig)
-        h = figure(1);
-        cla(h);
-        hold on;    
-        mnames  = [];
-        for mind = 1:length(methods)
-            plot(methods(mind).mean_err, 'color', methods(mind).color,'LineWidth',2, 'LineStyle', methods(mind).linestyle);
-            mnames{mind} = methods(mind).name;
-        end
-        hL = legend(mnames, 'Orientation','vertical');
-        ylim([0 1.5]);
-        xlim([1 step_number]);
-        title('Estimation Error','FontSize',12, 'FontWeight', 'normal');
-        lx = 'Step number';
-        xlabel(lx,'FontSize',12);
-        ly = 'Mean error norm';
-        ylabel(ly,'FontSize',12);
-        set(h,'Units','Inches');
-        pos = get(h,'Position');
-        set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-        print(h,'figures\track_theory.pdf','-dpdf','-r0')    
-        hold off;
-    else
-        cla;
-        hold on;    
-        mnames  = [];
-        for mind = 1:length(methods)
-            plot(methods(mind).mean_err, 'color', methods(mind).color,'LineWidth',2, 'LineStyle', methods(mind).linestyle);
-            mnames{mind} = methods(mind).name;
-        end
-        hL = legend(mnames, 'Orientation','vertical');
-        ylim([0 7]);
-        xlim([1 step_number]);
-        title('Estimation Error','FontSize',12, 'FontWeight', 'normal');
-        lx = 'Step number';
-        xlabel(lx,'FontSize',12);
-        ly = 'Mean error norm';
-        ylabel(ly,'FontSize',12); 
-        hold off;
+    cla;
+    hold on;    
+    mnames  = [];
+    for mind = 1:length(methods)
+        plot(methods(mind).mean_err, 'color', methods(mind).color,'LineWidth',2, 'LineStyle', methods(mind).linestyle);
+        mnames{mind} = methods(mind).name;
     end
+    hL = legend(mnames, 'Orientation','vertical');
+    ylim([0 7]);
+    xlim([1 step_number]);
+    title('Estimation Error','FontSize',12, 'FontWeight', 'normal');
+    lx = 'Step number';
+    xlabel(lx,'FontSize',12);
+    ly = 'Mean error norm';
+    ylabel(ly,'FontSize',12);     
+    hold off;
+    
+    h = figure(1);
+    cla(h);
+    hold on;    
+    mnames  = [];
+    for mind = 1:length(methods)
+        plot(methods(mind).mean_err, 'color', methods(mind).color,'LineWidth',2, 'LineStyle', methods(mind).linestyle);
+        mnames{mind} = methods(mind).name;
+    end
+    hL = legend(mnames, 'Orientation','vertical');
+    ylim([0 7]);
+    xlim([1 step_number]);
+    title('Estimation Error','FontSize',12, 'FontWeight', 'normal');
+    lx = 'Step number';
+    xlabel(lx,'FontSize',12);
+    ly = 'Mean error norm';
+    ylabel(ly,'FontSize',12);
+    set(h,'Units','Inches');
+    pos = get(h,'Position');
+    set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+    print(h,'figures\track_theory.pdf','-dpdf','-r0')    
+    hold off;
 
 end
