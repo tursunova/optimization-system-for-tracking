@@ -314,6 +314,7 @@ function iterations_pars_CreateFcn(hObject, eventdata, handles)
 
 
 function save_pars_button_Callback(hObject, eventdata, handles)
+    
     dim = str2double(get(handles.dim, 'string'));
     f = str2func(get(handles.fun, 'string'));
 
@@ -361,23 +362,27 @@ function save_pars_button_Callback(hObject, eventdata, handles)
 
     opt_pars = get(handles.pars_table, "Data");
     table_size = size(opt_pars);
-
-    fname = sprintf('saved_param.mat');
+    
+    save_path=strcat('~', filesep, 'OSfT');
+    if ( ~isfolder(save_path))
+        mkdir(save_path);
+    end
+    save_filename=strcat(save_path, filesep, 'saved_parameters.mat');
 
     if (table_size(1) < 2)
         sg_h = opt_pars(1,1);
-        save(fname, 'f', 'noise_model',  'noise_scale', 'drift_name', 'drift_scale', 'sg_h');
+        save(save_filename, 'f', 'noise_model',  'noise_scale', 'drift_name', 'drift_scale', 'sg_h');
     elseif (table_size(1) < 3)
         sg_h = opt_pars(1,1);
         fg_h = opt_pars(2,1);
-        save(fname, 'f', 'noise_model',  'noise_scale', 'drift_name', 'drift_scale', 'sg_h', 'fg_h');
+        save(save_filename, 'f', 'noise_model',  'noise_scale', 'drift_name', 'drift_scale', 'sg_h', 'fg_h');
     elseif (table_size(1) < 4)
         sg_h = opt_pars(1,1);
         fg_h = opt_pars(2,1);
         sfgt_h = opt_pars(3,1);
         sfgt_eta = opt_pars(3,2);
         sfgt_alphax = opt_pars(3,3);
-        save(fname, 'f', 'noise_model',  'noise_scale', 'drift_name', 'drift_scale', 'sg_h', 'fg_h',  'sfgt_h', 'sfgt_eta','sfgt_alphax');
+        save(save_filename, 'f', 'noise_model',  'noise_scale', 'drift_name', 'drift_scale', 'sg_h', 'fg_h',  'sfgt_h', 'sfgt_eta','sfgt_alphax');
     elseif (table_size(1) == 4)
         sg_h = opt_pars(1,1);
         fg_h = opt_pars(2,1);
@@ -387,5 +392,5 @@ function save_pars_button_Callback(hObject, eventdata, handles)
         rfqgt_h = opt_pars(4,1);
         rfqgt_eta = opt_pars(4,2);
         rfqgt_alphax = opt_pars(4,3);
-        save(fname, 'f', 'noise_model',  'noise_scale', 'drift_name', 'drift_scale', 'sg_h', 'fg_h',  'sfgt_h', 'rfqgt_h', 'sfgt_eta', 'rfqgt_eta', 'sfgt_alphax', 'rfqgt_alphax');
+        save(save_filename, 'f', 'noise_model',  'noise_scale', 'drift_name', 'drift_scale', 'sg_h', 'fg_h',  'sfgt_h', 'rfqgt_h', 'sfgt_eta', 'rfqgt_eta', 'sfgt_alphax', 'rfqgt_alphax');
     end
