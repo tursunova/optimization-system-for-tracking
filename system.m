@@ -127,32 +127,62 @@ if (is_custom_algo)
 end
 
 problem = problems.setup_problem(drift_name, dim, f, g, L, mu, drift_scale, init_point, custom_drift, noise_scale, noise_model, noise_fun);
-opt_pars = start_modeling(0, problem, trial_number, step_number, trial_optpars, step_optpars, method_names, noise_model);
+opt_pars = start_modeling(problem, trial_number, step_number, trial_optpars, step_optpars, method_names, noise_model);
 
 optpars_table = [];
+pars_num = 1;
 if (is_sg)
-    optpars_table = [optpars_table; opt_pars(1).h, NaN, NaN];
+    optpars_table = [optpars_table; opt_pars(pars_num).h, NaN, NaN];
+    pars_num = pars_num + 1;
+else
+    optpars_table = [optpars_table; NaN, NaN, NaN];
 end
 if (is_fg)
-    optpars_table = [optpars_table; opt_pars(2).h, NaN, NaN];
+    optpars_table = [optpars_table; opt_pars(pars_num).h, NaN, NaN];
+    pars_num = pars_num + 1;
+else
+    optpars_table = [optpars_table; NaN, NaN, NaN];
 end
 if (is_sfgt)
-    optpars_table = [optpars_table; opt_pars(3).h, opt_pars(3).eta, opt_pars(3).alphax];
+    optpars_table = [optpars_table; opt_pars(pars_num).h, opt_pars(pars_num).eta, opt_pars(pars_num).alphax];
+    pars_num = pars_num + 1;
+else
+    optpars_table = [optpars_table; NaN, NaN, NaN];
 end
 if (is_rfqgt)
-    optpars_table = [optpars_table; opt_pars(4).h, opt_pars(4).eta, opt_pars(4).alphax];
+    optpars_table = [optpars_table; opt_pars(pars_num).h, opt_pars(pars_num).eta, opt_pars(pars_num).alphax];
+    pars_num = pars_num + 1;
+else
+    optpars_table = [optpars_table; NaN, NaN, NaN];
 end
 
 set(handles.pars_table, "Data", optpars_table);
+
+
+optpars_fun = @() problems.setup_problem(drift_name, dim, f, g, L, mu, drift_scale, init_point, custom_drift, noise_scale, noise_model, noise_fun);
+optparstime = timeit(optpars_fun);
+optparstime
+
+modeling_fun = @() algos(problem, trial_number, step_number, trial_optpars, step_optpars, method_names, noise_model);
+algotime = timeit(modeling_fun);
+algotime
+
+total_time = algotime + optparstime;
+total_time
+
 if (is_custom_algo)
     rmpath(algo_path)
 end
 
+
 function rfqgt_Callback(hObject, eventdata, handles)
+
 
 function sfgt_Callback(hObject, eventdata, handles)
 
+
 function dim_Callback(hObject, eventdata, handles)
+
 
 function dim_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -236,118 +266,6 @@ function noise_scale_Callback(hObject, eventdata, handles)
 function noise_scale_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
-end
-
-
-function start_show_button_Callback(hObject, eventdata, handles)
-dim = str2double(get(handles.dim, 'string'));
-L = str2double(get(handles.lipsh, 'string'));
-mu = str2double(get(handles.mu, 'string'));
-
-trial_number = str2double(get(handles.iterations, 'string'));
-step_number = str2double(get(handles.steps, 'string'));
-
-trial_optpars = str2double(get(handles.iterations_pars, 'string'));
-step_optpars = str2double(get(handles.steps_pars, 'string'));
-
-f = str2func(get(handles.fun, 'string'));
-g = str2func(get(handles.grad, 'string'));
-
-is_sg = get(handles.sg, 'value');
-is_fg = get(handles.fg, 'value');
-is_sfgt = get(handles.sfgt, 'value');
-is_rfqgt = get(handles.rfqgt, 'value');
-is_custom_algo = get(handles.custom_algo, 'value');
-custom_algo = convertCharsToStrings(get(handles.algo, 'string'));
-
-noise_scale = str2double(get(handles.noise_scale, 'string'));
-
-rand_noise = get(handles.rand_noise, 'value');
-custom_noise = get(handles.custom_noise, 'value');
-noise_fun = str2func(get(handles.noise_model, 'string'));
-
-if (rand_noise)
-    noise_model = "rand";
-elseif (custom_noise)
-    noise_model = "custom";
-end
-
-drift_scale = str2double(get(handles.drift_scale, 'string'));
-init_point = str2num(get(handles.init_point, 'string'))';
-
-is_nodrift = get(handles.nodrift, 'value');
-is_linear = get(handles.linear, 'value');
-is_nonlinear = get(handles.nonlinear, 'value');
-is_rand = get(handles.rand, 'value');
-is_custom = get(handles.custom, 'value');
-
-custom_drift = str2func(get(handles.custom_drift, 'string'));
-
-if (is_nodrift)
-    drift_name = "nodrift";
-elseif (is_linear)
-    drift_name =  "linear";
-elseif (is_nonlinear)
-    drift_name =  "nonlinear";
-elseif (is_rand)
-    drift_name =  "rand";
-elseif (is_custom)
-    drift_name =  "custom";
-end
-
-sep = strfind(custom_algo, "/");
-num_sep = size(sep); 
-num_sep = num_sep(2);
-sep_ind = sep(num_sep);
-
-algo_path = extractBetween(custom_algo, 2, (sep_ind-1));
-algo_name = extractBetween(custom_algo, (sep_ind+2), strlength(custom_algo)-1);
-
-i = 0;
-method_names = {};
-
-if (is_sg)
-    i = i + 1;
-    method_names{i} = "sg";
-end
-if (is_fg)
-    i = i + 1;
-    method_names{i} = "fg";
-end
-if (is_sfgt)
-    i = i + 1;
-    method_names{i} = "sfgt";
-end
-if (is_rfqgt)
-    i = i + 1;
-    method_names{i} = "rfqgt";
-end
-if (is_custom_algo)
-    addpath(genpath(algo_path));
-    i = i + 1;
-    method_names{i} = algo_name;
-end
-
-problem = problems.setup_problem(drift_name, dim, f, g, L, mu, drift_scale, init_point, custom_drift, noise_scale, noise_model, noise_fun);
-opt_pars = start_modeling(1, problem, trial_number, step_number, trial_optpars, step_optpars, method_names, noise_model);
-
-optpars_table = [];
-if (is_sg)
-    optpars_table = [optpars_table; opt_pars(1).h, NaN, NaN];
-end
-if (is_fg)
-    optpars_table = [optpars_table; opt_pars(2).h, NaN, NaN];
-end
-if (is_sfgt)
-    optpars_table = [optpars_table; opt_pars(3).h, opt_pars(3).eta, opt_pars(3).alphax];
-end
-if (is_rfqgt)
-    optpars_table = [optpars_table; opt_pars(4).h, opt_pars(4).eta, opt_pars(4).alphax];
-end
-
-set(handles.pars_table, "Data", optpars_table);
-if (is_custom_algo)
-    rmpath(algo_path)
 end
 
 
@@ -496,7 +414,6 @@ function iterations_pars_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 
 function algo_Callback(hObject, eventdata, handles)
