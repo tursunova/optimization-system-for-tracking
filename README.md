@@ -1,4 +1,4 @@
-## System for modeling stochastic optimization algorithms for tracking
+## System for modeling of stochastic optimization algorithms for tracking
 
 ### HOWTO
 1. Clone the project
