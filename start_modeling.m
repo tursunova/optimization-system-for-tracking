@@ -112,5 +112,4 @@ function opt_pars = start_modeling(problem, trial_number, step_number, trial_opt
     set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
     print(h,'figures\track_theory.pdf','-dpdf','-r0')    
     hold off;
-
 end

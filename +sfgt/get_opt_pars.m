@@ -22,11 +22,9 @@ function opt_pars = get_opt_pars(problem, StepNum, TrialNum)
     opt_pars.h = h;
     opt_pars.eta = eta;
     opt_pars.alphax = alphax;
-    
-%     fname = sprintf('%s_%s_%3.3f_%3.3f.mat', sfgt.method_name(), problem.name, problem.noise_scale, problem.d);
-%     save(fname, 'h', 'alphax', 'eta');
-
 end
+
+
 function bnd = alphax_lbnd(L, mu, h, eta)
     H = h - h^2*L/2;
     bnd = sqrt(H*2*(mu-eta));

@@ -16,7 +16,6 @@ function [new_theta, d] = find_next_estimate(min_pt, d)
     xn = 1/(d.gamma_n+d.alpha_n*(d.mu-d.eta))*(d.alpha_n*d.gamma_n*d.v_n+gamma_n1*d.theta_n);
     
     g = d.Y(xn, min_pt);
-%     disp(g)
     new_theta = xn - d.h*g;
     
     d.v_n = 1/gamma_n1*((1-d.alpha_n)*d.gamma_n*d.v_n + d.alpha_n*(d.mu-d.eta)*xn-d.alpha_n*g); 
