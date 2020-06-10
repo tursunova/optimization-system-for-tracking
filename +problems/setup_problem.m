@@ -55,16 +55,17 @@ function problem = setup_problem(name, dim, f, g, L, mu, drift_scale, init_point
         
 end
 
+
 function problem = generate_new_noise_model(noise_model, noise_fun, problem)
     if (noise_model == "rand")
         problem.noise = randn(problem.dim,1)*problem.noise_scale;
     elseif (noise_model == "custom")
         problem.noise = noise_fun(problem.dim)*problem.noise_scale;
     end
-%     disp(problem.noise)
     problem.f_xi = @(x, minpt)problem.f(x, minpt) + problem.noise;
     problem.gf = @(x, minpt)problem.g(x, minpt) + problem.noise;
 end
+
 
 function minpt_hist = custom_minpt_hist(StepNum, problem, custom_drift)
 
@@ -78,6 +79,7 @@ function minpt_hist = custom_minpt_hist(StepNum, problem, custom_drift)
     
 end
 
+
 function minpt_hist = nodrift_minpt_hist(StepNum, problem)
 
     minpt = problem.init_point;
@@ -88,6 +90,7 @@ function minpt_hist = nodrift_minpt_hist(StepNum, problem)
     end
     
 end
+
 
 function minpt_hist = linear_minpt_hist(StepNum, problem)
     
@@ -101,6 +104,7 @@ function minpt_hist = linear_minpt_hist(StepNum, problem)
     
 end
 
+
 function minpt_hist = rand_minpt_hist(StepNum, problem)
 
     minpt = problem.init_point;
@@ -113,6 +117,7 @@ function minpt_hist = rand_minpt_hist(StepNum, problem)
     end
     
 end
+
 
 function minpt_hist = nonlinear_minpt_hist(StepNum, problem)
 
